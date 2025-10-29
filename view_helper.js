@@ -150,6 +150,14 @@ function define_new_effective_permissions(id_prefix, add_info_col = false, which
     // Set up the table:
     let effective_container = $(`<div id="${id_prefix}" class="ui-widget-content" style="overflow-y:scroll"></div>`)
     
+    // Add header row with better styling
+    effective_container.append(`
+        <div id="${id_prefix}_header" style="font-weight: bold; padding: 10px; background-color: #f5f5f5; border-bottom: 2px solid #ddd; margin-bottom: 10px;">
+            <div style="margin-bottom: 5px;">Permissions for: <span id="${id_prefix}_username_display" style="color: #2196F3;"></span></div>
+            <div style="font-size: 0.9em; color: #666;">File/Folder: <span id="${id_prefix}_filepath_display" style="color: #4CAF50;"></span></div>
+        </div>
+    `)
+    
     // If no subset of permissions is passed in, use all of them.
     if(which_permissions === null) {
         which_permissions = Object.values(permissions)
@@ -178,6 +186,11 @@ function define_new_effective_permissions(id_prefix, add_info_col = false, which
         // get current settings:
         let username = effective_container.attr('username')
         let filepath = effective_container.attr('filepath')
+        
+        // Update username and filepath display in header
+        $(`#${id_prefix}_username_display`).text(username || '(No user selected)')
+        $(`#${id_prefix}_filepath_display`).text(filepath || '(No file selected)')
+        
         // if both properties are set correctly:
         if( username && username.length > 0 && (username in all_users) &&
             filepath && filepath.length > 0 && (filepath in path_to_file)) {
