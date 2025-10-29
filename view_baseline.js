@@ -484,8 +484,7 @@ $("#adv_perm_inheritance").change(function () {
 });
 
 // listen for changes to "replace..." checkbox:
-$("#adv_perm_replace_child_permissions").change(function () {
-  if ($("#adv_perm_replace_child_permissions").prop("checked")) {
+$("#adv_perm_replace_child_permissions").on("click", function () {
     // we only care when it's been checked (nothing happens on uncheck) (this should really not be a checkbox...)
     let filepath = $("#advdialog").attr("filepath");
     let file_obj = path_to_file[filepath];
@@ -519,7 +518,6 @@ $("#adv_perm_replace_child_permissions").change(function () {
         },
       },
     });
-  }
 });
 
 // listen for mutations on selected user name in effective user permissions:
