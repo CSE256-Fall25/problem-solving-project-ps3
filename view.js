@@ -22,7 +22,7 @@ let effective_permissions_panel = define_new_effective_permissions('effpermpanel
 let user_select_field = define_new_user_select_field('userselfield', 'Select a User', change_selected_user);
 let explanations_dialog = define_new_dialog('expdialog');
 
-$('#sidepanel').append([effective_permissions_panel, user_select_field]);
+$('#sidepanel').append([user_select_field, effective_permissions_panel]);
 
 $('.perm_info').on('click', { target: this }, display_dialog)
 
@@ -38,7 +38,7 @@ function make_file_element(file_obj) {
             <h3 id="${file_hash}_header">
                 <span class="oi oi-folder" id="${file_hash}_icon"/> ${file_obj.filename} 
                 <button class="ui-button ui-widget ui-corner-all permbutton" path="${file_hash}" id="${file_hash}_permbutton"> 
-                    <span class="oi oi-lock-unlocked" id="${file_hash}_permicon"/>  Permissions
+                    <span class="oi oi-lock-unlocked" id="${file_hash}_permicon"/> Change Permissions
                 </button>
             </h3>
         </div>`)
@@ -58,7 +58,7 @@ function make_file_element(file_obj) {
         return $(`<div class='file'  id="${file_hash}_div">
             <span class="oi oi-file" id="${file_hash}_icon"/> ${file_obj.filename}
             <button class="ui-button ui-widget ui-corner-all permbutton" path="${file_hash}" id="${file_hash}_permbutton"> 
-                <span class="oi oi-lock-unlocked" id="${file_hash}_permicon"/>  Permissions
+                <span class="oi oi-lock-unlocked" id="${file_hash}_permicon"/> Permissions
             </button>
         </div>`)
     }
