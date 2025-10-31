@@ -1,38 +1,51 @@
 .file {
-    padding: 8;
-    border-bottom: 1px solid #dddddd;
+  padding: 8;
+  border-bottom: 1px solid #dddddd;
 }
 
 .section {
-    margin-bottom: 5px;
+  margin-bottom: 5px;
 }
 
-.ui-selected { 
-    background: #007fff; 
-    color: white; 
+.ui-selected {
+  background: #007fff;
+  color: white;
 }
 
 .footer {
-    position: fixed;
-    bottom: 0;
-    right: 0;
+  position: fixed;
+  bottom: 0;
+  right: 0;
 }
 
-
 #mturk-top-banner-drop-down-content {
-    position: absolute;
-    width: 99%;
-    bottom: 0px;
-    top:unset;
-    left: 0;
-    background-color: #eee;
-    z-index: 100;
-    padding: 10px 10px 10px 10px;
-    border-left: 1px orange solid;
-    border-right: 1px orange solid;
-    border-top: 1px orange solid;
+  position: absolute;
+  width: 99%;
+  bottom: 0px;
+  top: unset;
+  left: 0;
+  background-color: #eee;
+  z-index: 100;
+  padding: 10px 10px 10px 10px;
+  border-left: 1px orange solid;
+  border-right: 1px orange solid;
+  border-top: 1px orange solid;
 }
 
 .no-close .ui-dialog-titlebar-close {
-    display: none;
+  display: none;
+}
+
+.perm-info-btn {
+  border: 1px solid black;
+  background: none;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  color: #000000;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 6px;
 }
