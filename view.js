@@ -2,29 +2,17 @@
 const hardcoded_path = '/C/presentation_documents/important_file.txt';
 
 const change_selected_user = (selected_user) => {
-    $('#effpermpanel').attr({ username: selected_user, filepath: hardcoded_path });
-}
-
-const display_dialog = (event) => {
-    const path = $('#effpermpanel').attr('filepath');
-    const user = $('#effpermpanel').attr('username');
-    const perm = $(event.target).attr('permission_name');
-
-    const explanation = allow_user_action(path_to_file[path], all_users[user], perm, explain_why = true);
-
-    explanations_dialog.html(get_explanation_text(explanation));
-    explanations_dialog.dialog('open');
+    $('#regpermpanel').attr({ username: selected_user, filepath: hardcoded_path });
 }
 
 // ---- Define your dialogs  and panels here ----
 
-let effective_permissions_panel = define_new_effective_permissions('effpermpanel', add_info_col = true);
+let regular_permissions_panel = define_new_regular_permissions('regpermpanel', add_info_col = true);
 let user_select_field = define_new_user_select_field('userselfield', 'Select a User', change_selected_user);
 let explanations_dialog = define_new_dialog('expdialog');
 
-$('#sidepanel').append([user_select_field, effective_permissions_panel]);
+$('#sidepanel').append([regular_permissions_panel, user_select_field]);
 
-$('.perm_info').on('click', { target: this }, display_dialog)
 
 
 // ---- Display file structure ----

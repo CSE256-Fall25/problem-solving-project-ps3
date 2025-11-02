@@ -1,10 +1,76 @@
 .file {
-    padding: 8;
+    padding: 12px;
     border-bottom: 1px solid #dddddd;
 }
 
 .section {
-    margin-bottom: 5px;
+    margin-bottom: 12px;
+}
+
+#userselfield_line {
+    margin-top: 5px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+#userselfield_field {
+    padding: 10px 15px !important;
+    border: 1px solid #ced4da !important;
+    border-radius: 4px !important;
+    background-color: white !important;
+    font-size: 14px;
+    min-height: 40px;
+    margin-right: 10px;
+    display: flex !important;
+    align-items: center;
+    width: 100% !important;
+    box-sizing: border-box;
+}
+
+#userselfield_button {
+    padding: 10px 20px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    width: 100% !important;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+}
+
+#userselfield_button:hover {
+    background-color: #0056b3 !important;
+    border-color: #0056b3 !important;
+}
+
+@media (min-width: 768px) {
+    #userselfield_line {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    #userselfield_field {
+        width: calc(65% - 5px) !important;
+    }
+    
+    #userselfield_button {
+        width: calc(35% - 5px) !important;
+    }
+}
+
+@media (max-width: 767px) {
+    #sidepanel {
+        width: 100% !important;
+    }
+    
+    #filestructure {
+        width: 100% !important;
+        margin-bottom: 20px;
+    }
 }
 
 .ui-selected { 
@@ -27,7 +93,7 @@
     left: 0;
     background-color: #eee;
     z-index: 100;
-    padding: 10px 10px 10px 10px;
+    padding: 20px;
     border-left: 1px orange solid;
     border-right: 1px orange solid;
     border-top: 1px orange solid;
@@ -35,4 +101,122 @@
 
 .no-close .ui-dialog-titlebar-close {
     display: none;
+}
+
+/* Regular permissions panel styling */
+#regpermpanel {
+    margin-top: 17px;
+    margin-right: 10px;
+    border: 1px solid #dee2e6 !important;
+    border-radius: 4px !important;
+    overflow: hidden !important;
+}
+
+#regpermpanel_header {
+    background: linear-gradient(to bottom, #f8f9fa 0%, #e9ecef 100%);
+    border-bottom: 2px solid #dee2e6 !important;
+    padding: 15px 20px !important;
+    font-size: 14px;
+}
+
+#regpermpanel_header_username {
+    color: #0056b3;
+    font-weight: 600;
+}
+
+#regpermpanel_header_filepath {
+    color: #495057;
+    font-family: monospace;
+    font-size: 13px;
+}
+
+#regpermpanel_table {
+    margin: 0;
+}
+
+#regpermpanel_table tr {
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s ease;
+}
+
+#regpermpanel_table tr:hover {
+    background-color: #f8f9fa;
+}
+
+#regpermpanel_table tr:last-child {
+    border-bottom: none;
+}
+
+#regpermpanel_table td {
+    padding: 12px 15px;
+}
+
+.regular_perm_name {
+    font-size: 14px;
+    color: #333;
+}
+
+.regularcheckcell {
+    text-align: center;
+    color: #28a745;
+}
+
+/* Additional spacing improvements */
+textarea {
+    margin: 8px 0 12px 0;
+    padding: 10px;
+}
+
+label {
+    margin: 8px 0;
+    display: inline-block;
+}
+
+input[type="radio"] {
+    margin-right: 8px;
+}
+
+button.ui-button {
+    margin: 8px 4px;
+}
+
+#permentry {
+    padding: 20px;
+}
+
+#perm_entry_table {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+#perm_entry_table td,
+#perm_entry_table th {
+    padding: 10px 12px;
+}
+
+#advdialog {
+    padding: 15px;
+}
+
+#adv_perm_table_container {
+    margin: 12px 0;
+}
+
+#adv_perm_table td,
+#adv_perm_table th {
+    padding: 10px 12px;
+}
+
+#adv_perm_inheritance_div,
+#adv_perm_replace_child_div {
+    margin-top: 15px;
+}
+
+#user_select_dialog {
+    padding: 15px;
+}
+
+#filestructure {
+    padding: 15px;
+    margin-bottom: 15px;
 }
