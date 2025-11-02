@@ -247,6 +247,94 @@ function define_new_effective_permissions(
   return effective_container;
 }
 
+function perm_info_dialog_helper(dialog_param, group) {
+  switch (group) {
+    case "Read":
+      dialog_param.empty();
+      dialog_param.append(
+        "<h3><strong>Read</strong></h3>" +
+          "<p>View files/folders without modifying.</p><br>" +
+          "<ul>" +
+          "<li>List contents </li>" +
+          "<li>Read attributes </li>" +
+          "<li>Read extended attributes </li>" +
+          "<li>Read permissions </li>" +
+          "</ul>"
+      );
+      dialog_param.dialog("open");
+      break;
+    case "Write":
+      dialog_param.empty();
+      dialog_param.append(
+        "<h3><strong>Write</strong></h3>" +
+          "<p>Modify files/folders without deleting or executing.</p><br>" +
+          "<ul>" +
+          "<li>Create/Write files </li>" +
+          "<li>Create folders / Append data </li>" +
+          "<li>Write attributes </li>" +
+          "<li>Write extended attributes </li>" +
+          "</ul>"
+      );
+      dialog_param.dialog("open");
+      break;
+    case "Read_Execute":
+      dialog_param.empty();
+      dialog_param.append(
+        "<h3><strong>Read & Execute</strong></h3>" +
+          "<p>View and run files safely.</p><br>" +
+          "<ul>" +
+          "<li>List contents </li>" +
+          "<li>Read attributes </li>" +
+          "<li>Read extended attributes </li>" +
+          "<li>Read permissions </li>" +
+          "<li>Execute / Traverse </li>" +
+          "</ul>"
+      );
+      dialog_param.dialog("open");
+      break;
+    case "Modify":
+      dialog_param.empty();
+      dialog_param.append(
+        "<h3><strong>Modify</strong></h3>" +
+          "<p>Read, write, and delete files/folders.</p><br>" +
+          "<ul>" +
+          "<li>Create/Write files</li>" +
+          "<li>Create folders / Append data </li>" +
+          "<li>Write attributes </li>" +
+          "<li>Write extended attributes </li>" +
+          "<li>Delete files/folders </li>" +
+          "<li>Delete subfolders/files </li>" +
+          "</ul>"
+      );
+      dialog_param.dialog("open");
+      break;
+    case "Full_control":
+      dialog_param.empty();
+      dialog_param.append(
+        "<h3><strong>Full Control</strong></h3>" +
+          "<p>Total control including permissions and ownership.</p><br>" +
+          "<ul>" +
+          "<li>All read permissions</li>" +
+          "<li>All write/edit permissions</li>" +
+          "<li>Delete/Delete files and subfolders</li>" +
+          "<li>Change permissions </li>" +
+          "<li>Take ownership </li>" +
+          "</ul>"
+      );
+      dialog_param.dialog("open");
+      break;
+    case "Special_permissions":
+      dialog_param.empty();
+      dialog_param.append(`
+        <h3><strong>Special Permissions</strong></h3><br>
+        <p>This group includes custom or advanced permissions, allowing specific control over files and folders, such as execute without read access.</p>
+      `);
+      dialog_param.dialog("open");
+      break;
+    default:
+  }
+}
+
 // define an element which will display regular (direct) permissions for a given file and user
 function define_new_regular_permissions(
   id_prefix,
@@ -290,73 +378,84 @@ function define_new_regular_permissions(
     let username = regular_container.attr("username");
     let filepath = regular_container.attr("filepath");
 
-    if (
-      username &&
-      username.length > 0 &&
-      username in all_users &&
-      filepath &&
-      filepath.length > 0 &&
-      filepath in path_to_file
-    ) {
-      // Update header with user and file info
-      regular_container.find(`#${id_prefix}_header_username`).text(username);
+    // Check if we have a valid file path
+    let has_valid_filepath =
+      filepath && filepath.length > 0 && filepath in path_to_file;
+
+    // Check if we have a valid username
+    let has_valid_username =
+      username && username.length > 0 && username in all_users;
+
+    if (has_valid_filepath) {
+      // Update filepath in header
       regular_container.find(`#${id_prefix}_header_filepath`).text(filepath);
 
-      regular_container.find(`.regularcheckcell`).empty();
+      if (has_valid_username) {
+        // Update header with user info
+        regular_container.find(`#${id_prefix}_header_username`).text(username);
 
-      let file = path_to_file[filepath];
+        regular_container.find(`.regularcheckcell`).empty();
 
-      // For each permission group, check if the user has all permissions in that group
-      for (let group of which_groups) {
-        let has_group = false;
+        let file = path_to_file[filepath];
 
-        if (group === "Special_permissions") {
-          // Special_permissions is always unchecked in this view
-          has_group = false;
-        } else {
-          // Get the list of individual permissions for this group
-          let perms_in_group = permission_groups[group];
-          if (perms_in_group) {
-            // Check if ALL permissions in this group are directly assigned to the user
-            has_group = true;
-            for (let perm of perms_in_group) {
-              let has_perm = false;
+        // For each permission group, check if the user has all permissions in that group
+        for (let group of which_groups) {
+          let has_group = false;
 
-              for (let ace of file.acl) {
-                if (ace.permission === perm && ace.is_allow_ace) {
-                  let applies = false;
-                  if (typeof ace.who === "string") {
-                    applies = ace.who === username;
-                  } else {
-                    applies = ace.who.users.includes(username);
-                  }
+          if (group === "Special_permissions") {
+            // Special_permissions is always unchecked in this view
+            has_group = false;
+          } else {
+            // Get the list of individual permissions for this group
+            let perms_in_group = permission_groups[group];
+            if (perms_in_group) {
+              // Check if ALL permissions in this group are directly assigned to the user
+              has_group = true;
+              for (let perm of perms_in_group) {
+                let has_perm = false;
 
-                  if (applies) {
-                    has_perm = true;
-                    break;
+                for (let ace of file.acl) {
+                  if (ace.permission === perm && ace.is_allow_ace) {
+                    let applies = false;
+                    if (typeof ace.who === "string") {
+                      applies = ace.who === username;
+                    } else {
+                      applies = ace.who.users.includes(username);
+                    }
+
+                    if (applies) {
+                      has_perm = true;
+                      break;
+                    }
                   }
                 }
-              }
 
-              if (!has_perm) {
-                has_group = false;
-                break;
+                if (!has_perm) {
+                  has_group = false;
+                  break;
+                }
               }
             }
           }
-        }
 
-        if (has_group) {
-          let this_checkcell = regular_container.find(
-            `#${id_prefix}_checkcell_${group}`
-          );
-          this_checkcell.append(
-            `<span id="${id_prefix}_checkbox_${group}" class="oi oi-check"/>`
-          );
+          if (has_group) {
+            let this_checkcell = regular_container.find(
+              `#${id_prefix}_checkcell_${group}`
+            );
+            this_checkcell.append(
+              `<span id="${id_prefix}_checkbox_${group}" class="oi oi-check"/>`
+            );
+          }
         }
+      } else {
+        // File is selected but no user - show prompt
+        regular_container
+          .find(`#${id_prefix}_header_username`)
+          .text("Select User Below");
+        regular_container.find(`.regularcheckcell`).empty();
       }
     } else {
-      // Clear header if no valid user/file
+      // Clear header if no valid file
       regular_container.find(`#${id_prefix}_header_username`).text("");
       regular_container.find(`#${id_prefix}_header_filepath`).text("");
       regular_container.find(`.regularcheckcell`).empty();
@@ -384,19 +483,19 @@ function define_grouped_permission_checkboxes(id_prefix, which_groups = null) {
   let group_table = $(`
     <table id="${id_prefix}" class="ui-widget-content" width="100%">
         <tr id="${id_prefix}_header">
-            <th id="${id_prefix}_header_p" width="99%">Permissions for <span id="${id_prefix}_header_username"></span>
-            </th>
+            <th id="${id_prefix}_header_p" width="99%">Permissions for <span id="${id_prefix}_header_username"></span></th>
             <th id="${id_prefix}_header_allow">Allow</th>
             <th id="${id_prefix}_header_deny">Deny</th>
         </tr>
     </table>
-    `);
+   `);
 
   if (which_groups === null) {
     which_groups = perm_groupnames;
   }
   // For each permissions group, create a row:
   for (let g of which_groups) {
+    let dialog_result = define_new_dialog("permission-info");
     let row = $(`<tr id="${id_prefix}_row_${g}">
             <td id="${id_prefix}_${g}_name">${g}</td>
         </tr>`);
@@ -405,6 +504,13 @@ function define_grouped_permission_checkboxes(id_prefix, which_groups = null) {
                 <input type="checkbox" id="${id_prefix}_${g}_${ace_type}_checkbox" ptype="${ace_type}" class="groupcheckbox" group="${g}" ></input>
             </td>`);
     }
+    let infoButton = $(
+      `<button class="perm-info-btn" data-group="${g}">⋯</button>`
+    );
+    infoButton.on("click", function () {
+      perm_info_dialog_helper(dialog_result, $(this).data("group"));
+    });
+    row.find(`#${id_prefix}_${g}_name`).append(infoButton);
     group_table.append(row);
   }
 
