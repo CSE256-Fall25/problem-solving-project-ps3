@@ -344,12 +344,23 @@ function define_new_regular_permissions(
   let regular_container =
     $(`<div id="${id_prefix}" class="ui-widget-content" style="overflow-y:scroll">
         <div id="${id_prefix}_header" style="padding: 8px; font-weight: bold; border-bottom: 1px solid #ccc;">
-            Permissions for <span id="${id_prefix}_header_username"></span><br/>
+            Permissions for <span id="${id_prefix}_header_userselect"></span><br/>
             File: <span id="${id_prefix}_header_filepath"></span>
         </div>
         <table id="${id_prefix}_table" width="100%">
         </table>
     </div>`);
+
+  // ✴️ insert the dropdown where username used to be
+  let user_select = define_new_user_select_field(
+    `${id_prefix}_userselect`,
+    "Select User",
+    (selected_user) => {
+      regular_container.attr("username", selected_user);
+    }
+  );
+  regular_container.find(`#${id_prefix}_header_userselect`).append(user_select);
+
 
   let perm_table = regular_container.find(`#${id_prefix}_table`);
 
@@ -373,6 +384,7 @@ function define_new_regular_permissions(
         `);
     perm_table.append(row);
   }
+    
 
   let update_regular_contents = function () {
     let username = regular_container.attr("username");
@@ -545,7 +557,9 @@ function define_grouped_permission_checkboxes(id_prefix, which_groups = null) {
         path_to_file[filepath],
         username
       );
+      
 
+      
       for (ace_type in grouped_perms) {
         // 'allow' and 'deny'
         for (allowed_group in grouped_perms[ace_type]) {

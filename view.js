@@ -42,7 +42,7 @@ let user_select_field = define_new_user_select_field(
 );
 let explanations_dialog = define_new_dialog("expdialog");
 
-$("#sidepanel").append([regular_permissions_panel, user_select_field]);
+$("#sidepanel").append([regular_permissions_panel]);
 
 // Initialize the regular permissions panel with "Select User Below"
 $("#regpermpanel").attr({ username: "", filepath: "" });
