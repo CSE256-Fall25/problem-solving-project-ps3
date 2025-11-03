@@ -10,7 +10,7 @@ perm_dialog = define_new_dialog(
   (title = "Permissions"),
   (options = {
     // The following are standard jquery-ui options. See https://jqueryui.com/dialog/
-    height: 500,
+    height: 560,
     width: 400,
     buttons: {
       Save: {
@@ -400,7 +400,7 @@ $("#advtabs").tabs({
 let adv_contents = $(`#advdialog`).dialog({
   position: { my: "top", at: "top", of: $("#html-loc") },
   width: 700,
-  height: 450,
+  height: 500,
   modal: true,
   autoOpen: false,
   appendTo: "#html-loc",
@@ -484,7 +484,7 @@ $("#adv_perm_inheritance").change(function () {
 });
 
 // listen for changes to "replace..." checkbox:
-$("#adv_perm_replace_child_permissions").change(function () {
+$("#adv_perm_replace_child_permissions").on('click', function () {
     let filepath = $("#advdialog").attr("filepath");
   let file_obj = path_to_file[filepath];
   $(`<div id="replace_perm_dialog" title="Security">
