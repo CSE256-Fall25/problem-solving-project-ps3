@@ -427,6 +427,7 @@ $("#adv_perm_inheritance").change(function () {
   let file_obj = path_to_file[filepath];
   if ($("#adv_perm_inheritance").prop("checked")) {
     // has just been turned on
+    saveStateToUndoStack(); // Save state before making changes
     file_obj.using_permission_inheritance = true;
     emitState();
     open_advanced_dialog(filepath); // reload/reopen dialog
@@ -463,6 +464,7 @@ $("#adv_perm_inheritance").change(function () {
           click: function () {
             let filepath = $("#advdialog").attr("filepath");
             let file_obj = path_to_file[filepath];
+            saveStateToUndoStack(); // Save state before making changes
             file_obj.using_permission_inheritance = false;
             emitState();
             open_advanced_dialog(filepath); // reload/reopen 'advanced' dialog
@@ -549,6 +551,7 @@ $("#adv_owner_change_button").click(function () {
     selected_username.length > 0 &&
     selected_username in all_users
   ) {
+    saveStateToUndoStack(); // Save state before making changes
     file_obj.owner = all_users[selected_username];
     $("#adv_owner_current_owner").text(selected_username);
     emitState(); // Log new state

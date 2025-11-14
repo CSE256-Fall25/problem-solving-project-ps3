@@ -188,6 +188,90 @@ function get_allowed_actions_string(){
   return allowedActions
 }
 
+// Undo stack for permission changes
+let undoStack = [];
+
+// Save current permission state to the undo stack
+function saveStateToUndoStack() {
+  let state = {};
+  for (let filepath in path_to_file) {
+    let file = path_to_file[filepath];
+    // Deep clone the ACL array
+    state[filepath] = {
+      acl: file.acl.map(ace => ({
+        who: ace.who, // Reference is fine since users/groups don't change
+        permission: ace.permission,
+        is_allow_ace: ace.is_allow_ace
+      })),
+      using_permission_inheritance: file.using_permission_inheritance,
+      owner: file.owner // Reference is fine
+    };
+  }
+  undoStack.push(state);
+  // Update undo button appearance
+  if (typeof updateUndoButtonAppearance === 'function') {
+    updateUndoButtonAppearance();
+  }
+}
+
+// Restore state from the undo stack
+function restoreStateFromUndoStack() {
+  if (undoStack.length === 0) {
+    return false;
+  }
+  
+  let state = undoStack.pop();
+  
+  // Restore each file's state
+  for (let filepath in state) {
+    if (filepath in path_to_file) {
+      let file = path_to_file[filepath];
+      let savedState = state[filepath];
+      
+      // Restore ACL
+      file.acl = savedState.acl.map(ace => ({
+        who: ace.who,
+        permission: ace.permission,
+        is_allow_ace: ace.is_allow_ace
+      }));
+      
+      // Restore inheritance setting
+      file.using_permission_inheritance = savedState.using_permission_inheritance;
+      
+      // Restore owner
+      file.owner = savedState.owner;
+    }
+  }
+  
+  // Emit the restored state
+  emitState("Undo: Permission state restored");
+  
+  // Update UI - trigger reload of permission dialogs if they're open
+  if (typeof perm_dialog !== 'undefined' && perm_dialog && perm_dialog.attr("filepath")) {
+    let currentFilepath = perm_dialog.attr("filepath");
+    perm_dialog.attr("filepath", currentFilepath); // Force reload
+  }
+  
+  // Update side panel if it exists (for view.js)
+  if (typeof $("#regpermpanel") !== 'undefined' && $("#regpermpanel").length > 0) {
+    let currentFilepath = $("#regpermpanel").attr("filepath");
+    let currentUsername = $("#regpermpanel").attr("username");
+    if (currentFilepath) {
+      $("#regpermpanel").attr("filepath", currentFilepath); // Force reload
+    }
+    if (currentUsername) {
+      $("#regpermpanel").attr("username", currentUsername); // Force reload
+    }
+  }
+  
+  // Update undo button appearance
+  if (typeof updateUndoButtonAppearance === 'function') {
+    updateUndoButtonAppearance();
+  }
+  
+  return true;
+}
+
 function emitState(purpose = "Permission state changed"){
   let allowedActions = get_allowed_actions_string()
 
@@ -200,6 +284,7 @@ function emitState(purpose = "Permission state changed"){
 
 // add each permission in "permissions" (all of is_allow type) for the given file and user
 function add_permissons(file, user, permissions, is_allow) {
+  saveStateToUndoStack(); // Save state before making changes
   for(p of permissions) {
     file.acl.push(make_ace(user, p, is_allow))
   }
@@ -207,6 +292,7 @@ function add_permissons(file, user, permissions, is_allow) {
 }
 
 function remove_permissions(file, user, permissions, is_allow) {
+  saveStateToUndoStack(); // Save state before making changes
   file.acl = file.acl.filter(ace => {
     return !(ace.who === user && permissions.includes(ace.permission) && ace.is_allow_ace === is_allow)}
     )
@@ -215,6 +301,7 @@ function remove_permissions(file, user, permissions, is_allow) {
 
 // remove all permissions for given file and user
 function remove_all_perms_for_user(file, user) {
+  saveStateToUndoStack(); // Save state before making changes
   file.acl = file.acl.filter(ace => ace.who !==user)
   emitState()
 }

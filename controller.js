@@ -321,6 +321,7 @@ function get_grouped_permissions(file_obj, username) {
 
 function convert_parent_permissions(file_obj) {
     if (file_obj.using_permission_inheritance) {
+        saveStateToUndoStack(); // Save state before making changes
         // Only do this if inheritance is actually on
         for (user of Object.values(all_users)) {
             // for each user
@@ -344,6 +345,7 @@ function convert_parent_permissions(file_obj) {
 }
 
 function replace_child_perm_with_inherited(file_obj) {
+    saveStateToUndoStack(); // Save state before making changes
     let filepath = get_full_path(file_obj);
     for (c of parent_to_children[filepath]) {
         c.using_permission_inheritance = true;

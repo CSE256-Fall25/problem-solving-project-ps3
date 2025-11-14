@@ -22,6 +22,7 @@ AppEnum = {
 
 let $topBanner = $('#mturk-top-banner'),
     $backButton = $('#mturk-top-banner-back'),
+    $undoButton = $('#mturk-top-banner-undo'),
     $ddDown = $('#mturk-top-banner-drop-down-button'),
     $ddUp = $('#mturk-top-banner-collapse-button'),
     $ddContent = $('#mturk-top-banner-drop-down-content'),
@@ -44,6 +45,18 @@ let $topBanner = $('#mturk-top-banner'),
     },
     userData = {},
     app = '';
+
+// Function to update undo button appearance based on stack size
+function updateUndoButtonAppearance() {
+    // Check if undoStack exists (defined in model.js)
+    if (typeof undoStack !== 'undefined' && undoStack.length > 0) {
+        $undoButton.removeClass('mturk-top-banner-back-woh');
+        $undoButton.addClass('mturk-top-banner-back-wh');
+    } else {
+        $undoButton.removeClass('mturk-top-banner-back-wh');
+        $undoButton.addClass('mturk-top-banner-back-woh');
+    }
+}
 
 // function downloadObjectAsJson(exportObj = log, exportName = "log") {
 //     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj));
@@ -77,6 +90,27 @@ function setUpInitial() {
                 standardLoad(response.url);
             }
         });
+
+        $undoButton.on('click', function (e) {
+            e.stopPropagation();
+            const success = restoreStateFromUndoStack();
+            if (success) {
+                log.push(
+                    new SpecialEventEntry(
+                        ActionEnum.SPECIAL_EVENT,
+                        new Date().getTime(),
+                        {
+                            purpose: 'Undo button clicked',
+                        }
+                    )
+                );
+                // Update button appearance based on stack size
+                updateUndoButtonAppearance();
+            }
+        });
+
+            // Initialize undo button appearance
+        updateUndoButtonAppearance();
 
         $('#mturk-top-banner-arrow').on('click', () => {
             if ($ddContent.is(':visible')) {

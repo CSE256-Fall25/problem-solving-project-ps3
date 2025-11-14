@@ -18,6 +18,7 @@ let $wrapper = $("#wrapper"),
     $ddUp = $("#mturk-top-banner-collapse-button"),
     $ddContent = $("#mturk-top-banner-drop-down-content"),
     $backButton = $("#mturk-top-banner-back"),
+    $undoButton = $("#mturk-top-banner-undo"),
     topCtx = null,
     userData = null,
     execution = null,
@@ -160,6 +161,19 @@ function setUpBanner() {
             standardLoad(response.url);
         }
     });
+
+    $undoButton.on("click", (e) => {
+        e.stopPropagation();
+        const success = restoreStateFromUndoStack();
+        if (success && typeof updateUndoButtonAppearance === 'function') {
+            updateUndoButtonAppearance();
+        }
+    });
+
+    // Initialize undo button appearance
+    if (typeof updateUndoButtonAppearance === 'function') {
+        updateUndoButtonAppearance();
+    }
 
     $('#mturk-top-banner-clear').on("click", (e) => {
         if (execution) {
