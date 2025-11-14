@@ -79,8 +79,12 @@ perm_add_user_select = define_new_user_select_field(
       ) {
         // if such a user element doesn't already exist
         new_user_elem = make_user_elem("permdialog_file_user", selected_user);
+        new_user_elem.addClass("ui-selected");
         file_permission_users.append(new_user_elem);
+        grouped_permissions.attr("username", selected_user);
       }
+      file_permission_users.attr("selected_item", selected_user);
+      grouped_permissions.attr("username", selected_user);
     }
   })
 );
@@ -427,7 +431,6 @@ $("#adv_perm_inheritance").change(function () {
   let file_obj = path_to_file[filepath];
   if ($("#adv_perm_inheritance").prop("checked")) {
     // has just been turned on
-    saveStateToUndoStack(); // Save state before making changes
     file_obj.using_permission_inheritance = true;
     emitState();
     open_advanced_dialog(filepath); // reload/reopen dialog
@@ -464,7 +467,6 @@ $("#adv_perm_inheritance").change(function () {
           click: function () {
             let filepath = $("#advdialog").attr("filepath");
             let file_obj = path_to_file[filepath];
-            saveStateToUndoStack(); // Save state before making changes
             file_obj.using_permission_inheritance = false;
             emitState();
             open_advanced_dialog(filepath); // reload/reopen 'advanced' dialog
@@ -486,8 +488,8 @@ $("#adv_perm_inheritance").change(function () {
 });
 
 // listen for changes to "replace..." checkbox:
-$("#adv_perm_replace_child_permissions").on('click', function () {
-    let filepath = $("#advdialog").attr("filepath");
+$("#adv_perm_replace_child_permissions").on("click", function () {
+  let filepath = $("#advdialog").attr("filepath");
   let file_obj = path_to_file[filepath];
   $(`<div id="replace_perm_dialog" title="Security">
             This will replace explicitly defined permissions on all descendants of this object with inheritable permissions from ${file_obj.filename}.<br/>
@@ -507,7 +509,6 @@ $("#adv_perm_replace_child_permissions").on('click', function () {
           open_advanced_dialog(filepath); // reload/reopen 'advanced' dialog
           perm_dialog.attr("filepath", filepath); // reload contents of permissions dialog
           $(this).dialog("close");
-
         },
       },
       No: {
@@ -551,7 +552,6 @@ $("#adv_owner_change_button").click(function () {
     selected_username.length > 0 &&
     selected_username in all_users
   ) {
-    saveStateToUndoStack(); // Save state before making changes
     file_obj.owner = all_users[selected_username];
     $("#adv_owner_current_owner").text(selected_username);
     emitState(); // Log new state
