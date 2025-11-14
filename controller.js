@@ -74,7 +74,7 @@ permission_groups = {
     ],
 };
 perm_groupnames = Object.keys(permission_groups);
-perm_groupnames.push('Special_permissions');
+// perm_groupnames.push('Special_permissions');
 
 // Extra permission groups (this way Read, Write, Delete, Other make up the whole set; and are disjoint)
 // TODO/commit when??: WRITE_DATA should actually be in Write, also. [not in Other]
