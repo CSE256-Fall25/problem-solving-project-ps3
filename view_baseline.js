@@ -57,20 +57,7 @@ file_permission_users = define_single_select_list(
   }
 );
 file_permission_users.css({
-  height: "80px",
-});
-
-//Improved user select w/ a dropdown
-file_permission_users_drop = dropdown_single_select_list(
-    "permdialog_file_user_list_drop",
-    function (selected_user, e, ui) {
-        // when a new user is selected, change username attribute of grouped permissions:
-        grouped_permissions.attr("username", selected_user);
-        file_permission_users_drop.val(selected_user);
-    }
-);
-file_permission_users_drop.css({
-    display: "inline-block",
+  height: "30px",
 });
 
 // Make button to add a new user to the list:
@@ -88,15 +75,16 @@ perm_add_user_select = define_new_user_select_field(
       // sanity check that a user is actually selected (and exists)
       let expected_user_elem_id = `permdialog_file_user_${selected_user}`;
       if (
-        file_permission_users_drop.find(`#${expected_user_elem_id}`).length === 0
+        file_permission_users.find(`#${expected_user_elem_id}`).length === 0
       ) {
         // if such a user element doesn't already exist
-        new_user_elem = make_user_elem_option("permdialog_file_user", selected_user);
-        file_permission_users_drop.add_user(new_user_elem);
-        file_permission_users_drop.val(selected_user);
+        new_user_elem = make_user_elem("permdialog_file_user", selected_user);
+        new_user_elem.addClass("ui-selected");
+        file_permission_users.append(new_user_elem);
         grouped_permissions.attr("username", selected_user);
       }
-      file_permission_users_drop.attr("selected_item", selected_user);
+      file_permission_users.attr("selected_item", selected_user);
+      file_permission_users.val(selected_user);
       grouped_permissions.attr("username", selected_user);
     }
   })
@@ -140,7 +128,7 @@ let are_you_sure_dialog = define_new_dialog(
         id: "are-you-sure-yes-button",
         click: function () {
           // Which user and file were they trying to remove permissions for?
-          let username = file_permission_users_drop.attr("selected_item");
+          let username = file_permission_users.attr("selected_item");
           let filepath = perm_dialog.attr("filepath");
 
           // Remove all the permissions:
@@ -149,9 +137,25 @@ let are_you_sure_dialog = define_new_dialog(
             all_users[username]
           );
 
-            // Update the UI to show that it's been removed:
-          file_permission_users_drop.find("[name=" + username + "]").remove();
-          file_permission_users_drop.unselect(); // clear user selection
+          // Update the UI to show that it's been removed:
+          file_permission_users.find(".ui-selected").remove();
+          file_permission_users.unselect(); // clear user selection
+
+          file_permission_users.val("");
+          file_permission_users.attr("selected_item", "");
+          let firstUserOption = file_permission_users
+            .find("option")
+            .not('[value=""]')
+            .first();
+          if (firstUserOption.length > 0) {
+            let firstUser = firstUserOption.val();
+            file_permission_users.val(firstUser);
+            file_permission_users.attr("selected_item", firstUser);
+            grouped_permissions.attr("username", firstUser);
+            file_permission_users.trigger("change");
+          } else {
+            grouped_permissions.attr("username", "");
+          }
 
           // Finally, close this dialog:
           $(this).dialog("close");
@@ -176,10 +180,10 @@ perm_remove_user_button = $(
 );
 perm_remove_user_button.click(function () {
   // Get the current user and filename we are working with:
-  let selected_username = file_permission_users_drop.attr("selected_item");
+  let selected_username = file_permission_users.attr("selected_item");
 
   // Get the actual element that we want to remove from the user list:
-  let selected_user_elem = file_permission_users_drop.find(".ui-selected"); // find the element inside file_permission_users that has the special class ui-selected (given by jquery-ui selectable widget)
+  let selected_user_elem = file_permission_users.find(".ui-selected"); // find the element inside file_permission_users that has the special class ui-selected (given by jquery-ui selectable widget)
   let has_inherited_permissions =
     selected_user_elem.attr("inherited") === "true"; // does it have inherited attribute set to "true"?
 
@@ -198,7 +202,6 @@ perm_remove_user_button.click(function () {
 // --- Append all the elements to the permissions dialog in the right order: ---
 perm_dialog.append(obj_name_div);
 perm_dialog.append($('<div id="permissions_user_title" style="display: inline-block; margin-right: 6px;">Select User:</div>'));
-perm_dialog.append(file_permission_users_drop);
 perm_dialog.append(perm_add_user_select);
 perm_add_user_select.append(perm_remove_user_button); // Cheating a bit again - add the remove button the the 'add user select' div, just so it shows up on the same line.
 perm_dialog.append(grouped_permissions);
@@ -214,18 +217,22 @@ define_attribute_observer(perm_dialog, "filepath", function () {
 
   // Generate element with all the file-specific users:
   file_users = get_file_users(path_to_file[current_filepath]);
-  file_user_list = make_user_list_options(
+  file_user_list = make_user_list(
     "permdialog_file_user",
     file_users,
     (add_attributes = true)
   );
   grouped_permissions.attr("username", ""); // since we are reloading the user list, reset the username in permission checkboxes
   //replace previous user list with the one we just generated:
-  file_permission_users_drop.empty();
+  file_permission_users.empty();
+  file_permission_users.append(file_user_list);
 
-    file_user_list.forEach((user) => {
-        file_permission_users_drop.add_user(user);
-    });
+  let firstUserOption = file_permission_users.find("option").first();
+  if (firstUserOption.length > 0) {
+    let firstUser = firstUserOption.val();
+    file_permission_users.attr("selected_item", firstUser);
+    grouped_permissions.attr("username", firstUser);
+  }
 });
 
 // ---- Old code which doesn't use the helper functions starts here ----
