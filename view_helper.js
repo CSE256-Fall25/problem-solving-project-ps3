@@ -198,26 +198,30 @@ function dropdown_single_select_list(
     on_selection_change = function (selected_item_name, e, ui) {}
 ) {
     let select_list = $(
-        `<select id="${id_prefix}" ></select>`
-    ).selectmenu({
-        change: function (e, ui) {
-            let selected_item_name = $(this).val();
-            $(this).attr("selected_item", selected_item_name);
+        `<select id="${id_prefix}"></select>`
+    );
 
-            on_selection_change(selected_item_name, event, ui);
+    select_list.activate_selectmenu = function () {
+        $(this).selectmenu();
+    };
 
-            emitter.dispatchEvent(
-                new CustomEvent("userEvent", {
-                    detail: new ClickEntry(
-                        ActionEnum.CLICK,
-                        e.clientX + window.pageXOffset,
-                        e.clientY + window.pageYOffset,
-                        `${$(this).attr("id")} selected: ${selected_item_name}`,
-                        new Date().getTime()
-                    ),
-                })
-            );
-        },
+    select_list.on("selectmenuchange", function (e, ui) {
+        let selected_item_name = $(this).val();
+        $(this).attr("selected_item", selected_item_name);
+
+        on_selection_change(selected_item_name, e, ui);
+
+        emitter.dispatchEvent(
+            new CustomEvent("userEvent", {
+                detail: new ClickEntry(
+                    ActionEnum.CLICK,
+                    e.clientX + window.pageXOffset,
+                    e.clientY + window.pageYOffset,
+                    `${$(this).attr("id")} selected: ${selected_item_name}`,
+                    new Date().getTime()
+                ),
+            })
+        );
     });
 
     select_list.unselect = function () {

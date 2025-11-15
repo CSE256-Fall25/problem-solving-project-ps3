@@ -66,7 +66,6 @@ file_permission_users_drop = dropdown_single_select_list(
     function (selected_user, e, ui) {
         // when a new user is selected, change username attribute of grouped permissions:
         grouped_permissions.attr("username", selected_user);
-        file_permission_users_drop.val(selected_user);
     }
 );
 file_permission_users_drop.css({
@@ -199,6 +198,7 @@ perm_remove_user_button.click(function () {
 perm_dialog.append(obj_name_div);
 perm_dialog.append($('<div id="permissions_user_title" style="display: inline-block; margin-right: 6px;">Select User:</div>'));
 perm_dialog.append(file_permission_users_drop);
+file_permission_users_drop.activate_selectmenu(); //need this to enable the event handler correctly
 perm_dialog.append(perm_add_user_select);
 perm_add_user_select.append(perm_remove_user_button); // Cheating a bit again - add the remove button the the 'add user select' div, just so it shows up on the same line.
 perm_dialog.append(grouped_permissions);
