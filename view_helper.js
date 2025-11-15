@@ -54,6 +54,25 @@ function make_user_elem(id_prefix, uname, user_attributes = null) {
   return user_elem;
 }
 
+//make_user_elem as option for selectmenu
+function make_user_elem_option(id_prefix, uname, user_attributes = null) {
+    user_elem =
+        $(`<option class="ui-widget-content" id="${id_prefix}_${uname}" name="${uname}">
+        <span id="${id_prefix}_${uname}_icon" class="oi ${is_user(all_users[uname]) ? "oi-person" : "oi-people"
+            }"/> 
+        <span id="${id_prefix}_${uname}_text">${uname} </span>
+    </option>`);
+
+    if (user_attributes) {
+        // if we need to add the user's attributes: go through the properties for that user and add each as an attribute to user_elem.
+        for (uprop in user_attributes) {
+            user_elem.attr(uprop, user_attributes[uprop]);
+        }
+    }
+
+    return user_elem;
+}
+
 // make a list of users, suitable for inserting into a select list, given a map of user name to some arbitrary info.
 // optionally, adds all the properties listed for a given user as attributes for that user's element.
 function make_user_list(id_prefix, usermap, add_attributes = false) {
@@ -68,6 +87,21 @@ function make_user_list(id_prefix, usermap, add_attributes = false) {
     u_elements.push(user_elem);
   }
   return u_elements;
+}
+
+//make user list with options
+function make_user_list_options(id_prefix, usermap, add_attributes = false) {
+    let u_elements = [];
+    for (uname in usermap) {
+        // make user element; if add_attributes is true, pass along usermap[uname] for attribute creation.
+        user_elem = make_user_elem_option(
+            id_prefix,
+            uname,
+            add_attributes ? usermap[uname] : null
+        );
+        u_elements.push(user_elem);
+    }
+    return u_elements;
 }
 
 // --- helper functions to define various semi-permanent elements.
@@ -156,6 +190,46 @@ function define_single_select_list(
   };
 
   return select_list;
+}
+
+//Improved single select with dropdown (selectmenu)
+function dropdown_single_select_list(
+    id_prefix,
+    on_selection_change = function (selected_item_name, e, ui) {}
+) {
+    let select_list = $(
+        `<select id="${id_prefix}" ></select>`
+    ).selectmenu({
+        change: function (e, ui) {
+            let selected_item_name = $(this).val();
+            $(this).attr("selected_item", selected_item_name);
+
+            on_selection_change(selected_item_name, event, ui);
+
+            emitter.dispatchEvent(
+                new CustomEvent("userEvent", {
+                    detail: new ClickEntry(
+                        ActionEnum.CLICK,
+                        e.clientX + window.pageXOffset,
+                        e.clientY + window.pageYOffset,
+                        `${$(this).attr("id")} selected: ${selected_item_name}`,
+                        new Date().getTime()
+                    ),
+                })
+            );
+        },
+    });
+
+    select_list.unselect = function () {
+        on_selection_change("", null, null);
+    };
+
+    select_list.add_user = function (userElem) {
+        $(this).append(userElem);
+        $(this).val(userElem.get_user_name).selectmenu("refresh");
+    };
+
+    return select_list;
 }
 
 // define an element which will display effective permissions for a given file and user
