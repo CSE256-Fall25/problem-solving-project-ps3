@@ -36,13 +36,17 @@ function define_attribute_observer(
 // The element automatically creates an icon which varies based on whether it's a singular user or a group,
 // and also adds any attributes you pass along
 function make_user_elem(id_prefix, uname, user_attributes = null) {
-  user_elem =
-    $(`<div class="ui-widget-content" id="${id_prefix}_${uname}" name="${uname}">
-        <span id="${id_prefix}_${uname}_icon" class="oi ${
-      is_user(all_users[uname]) ? "oi-person" : "oi-people"
-    }"/> 
-        <span id="${id_prefix}_${uname}_text">${uname} </span>
-    </div>`);
+  // user_elem =
+  //   $(`<div class="ui-widget-content" id="${id_prefix}_${uname}" name="${uname}">
+  //       <span id="${id_prefix}_${uname}_icon" class="oi ${
+  //     is_user(all_users[uname]) ? "oi-person" : "oi-people"
+  //   }"/>
+  //       <span id="${id_prefix}_${uname}_text">${uname} </span>
+  //   </div>`);
+
+  user_elem = $(
+    `<option id="${id_prefix}_${uname}" value="${uname}">${uname}</option>`
+  );
 
   if (user_attributes) {
     // if we need to add the user's attributes: go through the properties for that user and add each as an attribute to user_elem.
@@ -121,37 +125,31 @@ function define_single_select_list(
   on_selection_change = function (selected_item_name, e, ui) {}
 ) {
   let select_list = $(
-    `<div id="${id_prefix}" style="overflow-y:scroll"></div>`
-  ).selectable({
-    selected: function (e, ui) {
-      // Unselect any previously selected (normally, selectable allows multiple selections)
-      $(ui.selected)
-        .addClass("ui-selected")
-        .siblings()
-        .removeClass("ui-selected");
+    `<select id="${id_prefix}" style="height:30px;"></select>`
+  );
 
-      // store info about what item was selected:
-      selected_item_name = $(ui.selected).attr("name");
-      $(this).attr("selected_item", selected_item_name);
+  select_list.on("change", function (e) {
+    let selected_item_name = $(this).val(); // The <option> value
+    $(this).attr("selected_item", selected_item_name);
+    on_selection_change(selected_item_name, e, null);
 
-      on_selection_change(selected_item_name, e, ui);
-
-      emitter.dispatchEvent(
-        new CustomEvent("userEvent", {
-          detail: new ClickEntry(
-            ActionEnum.CLICK,
-            e.clientX + window.pageXOffset,
-            e.clientY + window.pageYOffset,
-            `${$(this).attr("id")} selected: ${selected_item_name}`,
-            new Date().getTime()
-          ),
-        })
-      );
-    },
+    // Emit the event for logging
+    emitter.dispatchEvent(
+      new CustomEvent("userEvent", {
+        detail: new ClickEntry(
+          ActionEnum.CLICK,
+          e.clientX + window.pageXOffset,
+          e.clientY + window.pageYOffset,
+          `${$(this).attr("id")} selected: ${selected_item_name}`,
+          new Date().getTime()
+        ),
+      })
+    );
   });
 
   select_list.unselect = function () {
-    select_list.find(".ui-selectee").removeClass("ui-selected");
+    this.selectedIndex = -1;
+    $(this).attr("selected_item", "");
     on_selection_change("", null, null);
   };
 
@@ -361,7 +359,6 @@ function define_new_regular_permissions(
   );
   regular_container.find(`#${id_prefix}_header_userselect`).append(user_select);
 
-
   let perm_table = regular_container.find(`#${id_prefix}_table`);
 
   if (which_groups === null) {
@@ -384,7 +381,6 @@ function define_new_regular_permissions(
         `);
     perm_table.append(row);
   }
-    
 
   let update_regular_contents = function () {
     let username = regular_container.attr("username");
@@ -557,9 +553,7 @@ function define_grouped_permission_checkboxes(id_prefix, which_groups = null) {
         path_to_file[filepath],
         username
       );
-      
 
-      
       for (ace_type in grouped_perms) {
         // 'allow' and 'deny'
         for (allowed_group in grouped_perms[ace_type]) {

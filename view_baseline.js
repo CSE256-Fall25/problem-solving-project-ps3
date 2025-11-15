@@ -57,7 +57,7 @@ file_permission_users = define_single_select_list(
   }
 );
 file_permission_users.css({
-  height: "80px",
+  height: "30px",
 });
 
 // Make button to add a new user to the list:
@@ -84,6 +84,7 @@ perm_add_user_select = define_new_user_select_field(
         grouped_permissions.attr("username", selected_user);
       }
       file_permission_users.attr("selected_item", selected_user);
+      file_permission_users.val(selected_user);
       grouped_permissions.attr("username", selected_user);
     }
   })
@@ -139,6 +140,22 @@ let are_you_sure_dialog = define_new_dialog(
           // Update the UI to show that it's been removed:
           file_permission_users.find(".ui-selected").remove();
           file_permission_users.unselect(); // clear user selection
+
+          file_permission_users.val("");
+          file_permission_users.attr("selected_item", "");
+          let firstUserOption = file_permission_users
+            .find("option")
+            .not('[value=""]')
+            .first();
+          if (firstUserOption.length > 0) {
+            let firstUser = firstUserOption.val();
+            file_permission_users.val(firstUser);
+            file_permission_users.attr("selected_item", firstUser);
+            grouped_permissions.attr("username", firstUser);
+            file_permission_users.trigger("change");
+          } else {
+            grouped_permissions.attr("username", "");
+          }
 
           // Finally, close this dialog:
           $(this).dialog("close");
@@ -210,6 +227,13 @@ define_attribute_observer(perm_dialog, "filepath", function () {
   //replace previous user list with the one we just generated:
   file_permission_users.empty();
   file_permission_users.append(file_user_list);
+
+  let firstUserOption = file_permission_users.find("option").first();
+  if (firstUserOption.length > 0) {
+    let firstUser = firstUserOption.val();
+    file_permission_users.attr("selected_item", firstUser);
+    grouped_permissions.attr("username", firstUser);
+  }
 });
 
 // ---- Old code which doesn't use the helper functions starts here ----
