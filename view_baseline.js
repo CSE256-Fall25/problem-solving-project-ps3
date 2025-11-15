@@ -63,7 +63,7 @@ file_permission_users.css({
 // Make button to add a new user to the list:
 perm_add_user_select = define_new_user_select_field(
   "perm_add_user",
-  "Add User...",
+  "Add User",
   (on_user_change = function (selected_user) {
     // console.log("add...")
     let filepath = perm_dialog.attr("filepath");
@@ -184,9 +184,7 @@ perm_remove_user_button.click(function () {
 
 // --- Append all the elements to the permissions dialog in the right order: ---
 perm_dialog.append(obj_name_div);
-perm_dialog.append(
-  $('<div id="permissions_user_title">Group or user names:</div>')
-);
+perm_dialog.append($('<div id="permissions_user_title">Select User:</div>'));
 perm_dialog.append(file_permission_users);
 perm_dialog.append(perm_add_user_select);
 perm_add_user_select.append(perm_remove_user_button); // Cheating a bit again - add the remove button the the 'add user select' div, just so it shows up on the same line.
