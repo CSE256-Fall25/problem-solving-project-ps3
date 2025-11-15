@@ -149,7 +149,6 @@ let are_you_sure_dialog = define_new_dialog(
           );
 
             // Update the UI to show that it's been removed:
-          file_permission_users_drop.find("[name=" + username + "]").remove();
           file_permission_users_drop.unselect(); // clear user selection
 
           // Finally, close this dialog:

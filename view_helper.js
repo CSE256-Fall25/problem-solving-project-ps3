@@ -225,12 +225,26 @@ function dropdown_single_select_list(
     });
 
     select_list.unselect = function () {
-        on_selection_change("", null, null);
+        let selected_item_name = $(this).val();
+
+        $(this).find("option:selected").remove();  //remove selected
+
+        // try to set to first item
+        if ($(this).find('option').length > 0) {
+            $(this).val($(this).find('option:last').val());
+        } else {
+            $(this).val(''); //no first item
+        }
+
+        on_selection_change($(this).val(), null, null); //update via callback
+
+        $(this).selectmenu('refresh');
     };
 
     select_list.add_user = function (userElem) {
         $(this).append(userElem);
-        $(this).val(userElem.get_user_name).selectmenu("refresh");
+        $(this).val(userElem.get_user_name); //sets the selected item
+        $(this).selectmenu('refresh');
     };
 
     return select_list;
